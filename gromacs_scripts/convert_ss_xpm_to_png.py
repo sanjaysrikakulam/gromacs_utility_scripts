@@ -156,7 +156,7 @@ def plot_xvg(ss_xvg_file):
         plt.xlabel("Residue")
         plt.ylabel("Probability")
         plt.title("Secondary structure content")
-        legends = ax.legend(bbox_to_anchor=(1, 1.01), loc=2, handlelength = 0.8)
+        legends = ax.legend(bbox_to_anchor=(1, 1.01), loc=2)
         png_file_name = ss_xvg_file.replace("xvg", "png")
         plt.savefig(png_file_name, dpi = 300, bbox_extra_artists=(legends,), bbox_inches='tight')
         
