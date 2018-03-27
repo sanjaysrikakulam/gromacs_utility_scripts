@@ -31,6 +31,6 @@ def main():
     plotxvg("backbone_rmsf.xvg", out_dir)
 
 # Function call
-if __name__=='__main__':
+if __name__ == '__main__':
     main()
 

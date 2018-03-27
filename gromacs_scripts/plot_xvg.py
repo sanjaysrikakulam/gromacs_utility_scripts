@@ -42,12 +42,10 @@ def plotxvg(filename, out_dir):
                 if re.match("title", line.split()[1]):
                     title = line.split()[2].strip('\"')
 
-
                 # Extracts the legends for the axes
                 if len(line.split()) > 3:
                     if re.match("label", line.split()[2]):
                         xyaxis_labels.append(line.split('"')[1])
-
 
             if not line.startswith("@") and not line.startswith("#"):
                                   data_x.append(float(line.split()[0]))
@@ -63,5 +61,5 @@ def plotxvg(filename, out_dir):
         plt.savefig(out_file, dpi = 300)
         
 # Function call
-if __name__=='__main__':
+if __name__ == '__main__':
     main()

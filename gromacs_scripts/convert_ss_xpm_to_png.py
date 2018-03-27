@@ -1,6 +1,6 @@
 #! python2
 """
-Description: A program that reads and converts the Secondary structure XMP file from GROMACS 'gmx do_dssp' to XVG file 
+Description: A program that reads and converts the Secondary structure XPM file from GROMACS 'gmx do_dssp' to XVG file 
 		(calculates the secondary structure propensity per residue) and also produces a plot of the same. 
 								(tested on GROAMACS version 5.1.*)
 Author: Sanjay kumar Srikakulam (sanjaysrikakulam@gmail.com)
@@ -26,25 +26,24 @@ def main():
     parser.add_argument("-x", dest = 'xpm_file', help = "Secondary structure XPM file from GROMACS (e.g., *.xpm)", required = True )
     parser.add_argument("-d", dest = 'out_dir', nargs = '?', help = "Path to the output directory", default = os.getcwd())
 
-    global out_dir
     args = parser.parse_args()
     xpm_file = args.xpm_file
     out_dir = args.out_dir
     xvg_out_file = "/".join([out_dir, xpm_file.replace("xpm", "xvg")])
     
     # Function call
-    xpm_to_xvg(xpm_file)
+    xpm_to_xvg(xpm_file, out_dir)
     plot_xvg(xvg_out_file)
    
-# Parses and converts the GROAMACS (5.1.*) produced secondary structure XPM file to XVG file (secondary structure propensity per residue)
-def xpm_to_xvg(ss_xpm_file): 
+# Parses and converts the GROAMACS (5.1.*) produced secondary structure XPM file to XVG file (calculates secondary structure propensity per residue)
+def xpm_to_xvg(ss_xpm_file, out_dir): 
     with open(ss_xpm_file, 'r') as file:
         y_axis = list()
         number_of_frames = int()
         number_of_residues = int()
         xvg_out_file = "/".join([out_dir, ss_xpm_file.replace("xpm", "xvg")])
         
-        # Parses the XPM file and keeps the necessary information
+        # Parses the XPM file and keeps the necessary secondary structure information
         for line in file:
             if line.startswith("static char"):
                 number_of_frames, number_of_residues = next(file).split()[0:2]
@@ -96,6 +95,7 @@ def xpm_to_xvg(ss_xpm_file):
         if not os.path.exists(xvg_out_file):
             with open(xvg_out_file, "a") as op:
                 op.write("# Author: Sanjay kumar Srikakulam (sanjaysrikakulam@gmail.com)\n")
+				op.write("# Information: XVG file produced from the script convert_ss_xpm_to_png.py (https://github.com/sanjaysrikakulam/gromacs_utility_scripts/gromacs_scripts/convert_ss_xpm_to_png.py) \n")
                 op.write("# Description: Probability of various secondary structure elements, by residue.\n")
                 op.write("@\ttitle\t\"Secondary Structure Content\"\n")
                 op.write("@\txaxis\tlabel \"Residue\"\n")
@@ -161,5 +161,5 @@ def plot_xvg(ss_xvg_file):
         plt.savefig(png_file_name, dpi = 300, bbox_extra_artists=(legends,), bbox_inches='tight')
         
 # Function call
-if __name__=='__main__':
+if __name__ == '__main__':
     main()
