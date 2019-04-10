@@ -29,7 +29,7 @@ def main():
     args = parser.parse_args()
     xpm_file = args.xpm_file
     out_dir = args.out_dir
-    xvg_out_file = "/".join([out_dir, xpm_file.replace("xpm", "xvg")])
+    xvg_out_file = "/".join([out_dir, os.path.basename(xpm_file).replace("xpm", "xvg")])
     
     # Function call
     xpm_to_xvg(xpm_file, out_dir)
@@ -41,7 +41,7 @@ def xpm_to_xvg(ss_xpm_file, out_dir):
         y_axis = list()
         number_of_frames = int()
         number_of_residues = int()
-        xvg_out_file = "/".join([out_dir, ss_xpm_file.replace("xpm", "xvg")])
+        xvg_out_file = "/".join([out_dir, os.path.basename(ss_xpm_file).replace("xpm", "xvg")])
         
         # Parses the XPM file and keeps the necessary secondary structure information
         for line in file:
@@ -52,8 +52,8 @@ def xpm_to_xvg(ss_xpm_file, out_dir):
                 
             if len(line.split()) > 1:
                 if re.match("y-axis", line.split()[1]):
-                    y_axis = line.split()[2:-1]
-                    
+                    y_axis.append(line.split()[2:-1])
+
         # Keeps only the secondary structure data and discards the rest (comments, x- & y-axes information, etc)
         lines = file.readlines()
         lines = subprocess.check_output("cat {0} | sed '0,/y-axis/d'".format(ss_xpm_file), shell = True)
@@ -95,7 +95,7 @@ def xpm_to_xvg(ss_xpm_file, out_dir):
         if not os.path.exists(xvg_out_file):
             with open(xvg_out_file, "a") as op:
                 op.write("# Author: Sanjay kumar Srikakulam (sanjaysrikakulam@gmail.com)\n")
-				op.write("# Information: XVG file produced from the script convert_ss_xpm_to_png.py (https://github.com/sanjaysrikakulam/gromacs_utility_scripts/gromacs_scripts/convert_ss_xpm_to_png.py) \n")
+                op.write("# Information: XVG file prodzuced from the script convert_ss_xpm_to_png.py (https://github.com/sanjaysrikakulam/gromacs_utility_scripts/gromacs_scripts/convert_ss_xpm_to_png.py) \n")
                 op.write("# Description: Probability of various secondary structure elements, by residue.\n")
                 op.write("@\ttitle\t\"Secondary Structure Content\"\n")
                 op.write("@\txaxis\tlabel \"Residue\"\n")
@@ -109,7 +109,11 @@ def xpm_to_xvg(ss_xpm_file, out_dir):
                 op.write("@ s5 legend \"\\f{Symbol}b\\f{Times}-Turn\"\n")
                 op.write("@ s6 legend \"\\f{Symbol}b\\f{Times}-Bridge\"\n")
                 op.write("@ s7 legend \"Coil\"\n")
-        
+                
+                # Y-axis list flattening
+                y_axis = [num for number in y_axis for num in number]           
+                
+                # Output generation
                 for z in range(1, number_of_residues + 1):
                     op.write("%s\t\t%.6f\t\t%.6f\t\t%.6f\t\t%.6f\t\t%.6f\t\t%.6f\t\t%.6f\t\t%.6f\t\t\n" % (y_axis[z-1], alpha_helix[z]/number_of_frames, pi_helix[z]/number_of_frames, three_10_helix[z]/number_of_frames, beeta_sheet[z]/number_of_frames, bend[z]/number_of_frames, turn[z]/number_of_frames, bridge[z]/number_of_frames, coil[z]/number_of_frames))
         else:
